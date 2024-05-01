@@ -49,7 +49,7 @@ def predictMovies(movie:str):
     for movie in sorted_similar_movies:
         index=movie[0]
         title_from_index=movie_data[movie_data.index==index]['title'].values[0]
-        if(i<10):
+        if(i<15):
             data.append(title_from_index)
             i+=1
     return data        
@@ -60,27 +60,32 @@ def predictMovies(movie:str):
 def home():
     return {"Working"}
     
-@app.post('/predict')
+@app.get('/predict/{moviename}')
 def predict_movies( moviename : str):
     return { "Movies" : predictMovies(moviename)}
 
 @app.get('/autocomplete/{name}')
 def auto_suggestion(name:str):
+    if name == "":
+        return {"name":[]}
     movie_data = pd.read_csv("movies.csv", encoding="utf-8")
     titles = movie_data["title"]
-    titles = titles.str.lower()
-    pattern = name.lower()
-    matched_titles = [t for t in titles if re.search(pattern, t)] 
+    pattern = re.compile(name, re.IGNORECASE) 
+    matched_titles = [t for t in titles if re.search(pattern, t)]
     return {"name":matched_titles[:10]}
 
 @app.get('/{name}')
 def get_movie(name: str):
     movie_data = pd.read_csv("movies.csv", encoding="utf-8")
+    features = []
+    for m in movie_data:
+        features.append(m)
+    for f in features:
+        movie_data[f]=movie_data[f].fillna('')
     movie_data.set_index('title', inplace=True)
     result = movie_data.loc[name]
     result = result.drop("crew")
     data = result.to_dict()  # Convert Series object to dictionary
-    print(data)
     movie_data.reset_index(inplace=True)
     return {"data":data}
 
