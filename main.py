@@ -27,8 +27,9 @@ app.add_middleware(
 
 
 
-movie_data = pd.read_csv("movies.csv")  
+
 def predictMovies(movie:str):
+    movie_data = pd.read_csv("movies.csv", encoding="utf-8")
     selected_features=['genres','keywords','tagline','cast','director']
     for feature in selected_features:
         movie_data[feature]=movie_data[feature].fillna('')
@@ -65,6 +66,7 @@ def predict_movies( moviename : str):
 
 @app.get('/autocomplete/{name}')
 def auto_suggestion(name:str):
+    movie_data = pd.read_csv("movies.csv", encoding="utf-8")
     titles = movie_data["title"]
     titles = titles.str.lower()
     pattern = name.lower()
@@ -73,6 +75,7 @@ def auto_suggestion(name:str):
 
 @app.get('/{name}')
 def get_movie(name: str):
+    movie_data = pd.read_csv("movies.csv", encoding="utf-8")
     movie_data.set_index('title', inplace=True)
     result = movie_data.loc[name]
     result = result.drop("crew")
