@@ -4,7 +4,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import re
 app = FastAPI()
 
@@ -20,16 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-
-
-
-
-
-
 def predictMovies(movie:str):
-    movie_data = pd.read_csv("movies.csv", encoding="utf-8")
+    movie_data = pd.read_csv("./app/movies.csv", encoding="utf-8")
     selected_features=['genres','keywords','tagline','cast','director']
     for feature in selected_features:
         movie_data[feature]=movie_data[feature].fillna('')
@@ -68,7 +59,7 @@ def predict_movies( moviename : str):
 def auto_suggestion(name:str):
     if name == "":
         return {"name":[]}
-    movie_data = pd.read_csv("movies.csv", encoding="utf-8")
+    movie_data = pd.read_csv("./app/movies.csv", encoding="utf-8")
     titles = movie_data["title"]
     pattern = re.compile(name, re.IGNORECASE) 
     matched_titles = [t for t in titles if re.search(pattern, t)]
@@ -76,7 +67,7 @@ def auto_suggestion(name:str):
 
 @app.get('/{name}')
 def get_movie(name: str):
-    movie_data = pd.read_csv("movies.csv", encoding="utf-8")
+    movie_data = pd.read_csv("./app/movies.csv", encoding="utf-8")
     features = []
     for m in movie_data:
         features.append(m)
